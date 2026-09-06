@@ -1,5 +1,8 @@
 # Prepare all nodes
-{
+```bash
+
+sudo su
+
 apt-get update
 apt-get install -y apt-transport-https ca-certificates curl
 
@@ -38,18 +41,14 @@ apt-get update
 apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
-crictl config \
-    --set runtime-endpoint=unix:///run/containerd/containerd.sock \
-    --set image-endpoint=unix:///run/containerd/containerd.sock
-
 cat <<EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS='--node-ip $(ip -4 addr show enp0s8 | grep "inet" | head -1 |awk '{print $2}' | cut -d/ -f1)'
 EOF
-}
+```
 
 # Install Controlplane
 
-{
+```bash
 POD_CIDR=10.244.0.0/16
 PRIMARY_IP=192.168.56.11
 
@@ -60,11 +59,12 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
-}
+```
 
 # Join the nodes
 
-Join Workers
+
+Before joining the cluster, run th same script to prepare the node. One it's done, we can proceed.
 
 If you did not note down the join command on the controlplane node after running `kubeadm`, you can recover it by running the following on `controlplane`
 
@@ -83,7 +83,7 @@ On each of `node01` and `node02` do the following
     sudo -i
     ```
 
-1.  Join the node
+2.  Join the node
 
     > Paste the `kubeadm join` command output by `kubeadm init` on the control plane
 

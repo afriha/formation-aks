@@ -51,14 +51,15 @@ EOF
 
 {
 POD_CIDR=10.244.0.0/16
-SERVICE_CIDR=10.96.0.0/16
-PRIMARY_IP=192.168.56.11/24
+PRIMARY_IP=192.168.56.11
 
-kubeadm init --pod-network-cidr $POD_CIDR --service-cidr $SERVICE_CIDR --apiserver-advertise-address $PRIMARY_IP
+kubeadm init --pod-network-cidr $POD_CIDR --apiserver-advertise-address $PRIMARY_IP
 
-kubectl --kubeconfig /etc/kubernetes/admin.conf \
-    apply -f "https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml"
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
 }
 
 # Join the nodes

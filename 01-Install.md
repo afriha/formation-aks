@@ -85,3 +85,20 @@ On each of `node01` and `node02` do the following
 1.  Join the node
 
     > Paste the `kubeadm join` command output by `kubeadm init` on the control plane
+
+# Basic
+
+List all nodes
+```bash
+kubectl get nodes
+```
+
+List all pods in kube-system
+```bash
+kubectl pods -n kube-system
+```
+
+List configurations
+```bash
+kubectl config get-contexts
+```

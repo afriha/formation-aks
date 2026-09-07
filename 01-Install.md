@@ -45,17 +45,7 @@ cat <<EOF > /etc/default/kubelet
 KUBELET_EXTRA_ARGS='--node-ip $(ip -4 addr show enp0s8 | grep "inet" | head -1 |awk '{print $2}' | cut -d/ -f1)'
 EOF
 ```
-In case of errors, to reset:
 
-```bash
-sudo systemctl stop kubelet
-sudo systemctl stop containerd
-sudo kubeadm reset -f
-sudo rm -rf /etc/cni/net.d
-rm -rf ~/.kube
-sudo rm -rf /etc/kubernetes
-sudo rm -rf /var/lib/etcd
-```
 # Install Controlplane
 
 ```bash
@@ -69,6 +59,17 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
+```
+In case of errors, to reset:
+
+```bash
+sudo systemctl stop kubelet
+sudo systemctl stop containerd
+sudo kubeadm reset -f
+sudo rm -rf /etc/cni/net.d
+rm -rf ~/.kube
+sudo rm -rf /etc/kubernetes
+sudo rm -rf /var/lib/etcd
 ```
 
 # Join the nodes

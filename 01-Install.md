@@ -60,6 +60,11 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
 ```
+Check the nodes:
+```bash
+kubectl get nodes
+kubectl get pods -A
+```
 In case of errors, to reset:
 
 ```bash

@@ -43,7 +43,7 @@ Then run kubectl apply command against this file.
 ```bash
 kubectl apply -f pod.yaml
 ```
-##Resource Limits
+## Resource Limits
 ```yaml
 apiVersion: v1
 kind: Pod

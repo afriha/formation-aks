@@ -73,7 +73,6 @@ sudo systemctl stop containerd
 sudo kubeadm reset -f
 sudo rm -rf /etc/cni/net.d
 rm -rf ~/.kube
-sudo rm -rf /etc/kubernetes
 sudo rm -rf /var/lib/etcd
 ```
 

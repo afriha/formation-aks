@@ -6,6 +6,10 @@ kind: Namespace
 metadata:
   name: dev
 ```
+```bash
+kubectl get namespaces
+kubectl get namespace dev
+```
 ## ResourceQuota
 ```yaml
 apiVersion: v1

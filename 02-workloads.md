@@ -87,14 +87,14 @@ spec:
 ## Taint and tolerations
 Add a taint to your node
 ```bash
-kubectl taint nodes node1 app=blue:NoSchedule
+kubectl taint nodes node01 app=blue:NoSchedule
 ```
 Apply a toleration to your pod
 ```yaml
 apiVersion:
 kind: Pod
 metadata:
- name: myapp-pod
+ name: myapp-pod-taint
  namespace: dev
 spec:
   containers:
@@ -106,3 +106,52 @@ spec:
     value: "blue"
     effect: "NoSchedule"
 ```
+## NodeSelector
+```bash
+kubectl label nodes node01 size=small
+```
+Apply the nodeSelector to your pod
+```yaml
+apiVersion:
+kind: Pod
+metadata:
+ name: myapp-pod-selector
+ namespace: dev
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "blue"
+    effect: "NoSchedule"
+  nodeSelector:
+    size: small
+```
+## NodeAffinity
+```yaml
+apiVersion:
+kind: Pod
+metadata:
+ name: myapp-pod-affinity
+ namespace: dev
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In
+            values: [small]
+  containers:
+  - name: nginx-container
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "blue"
+    effect: "NoSchedule"
+```
+# Deployment

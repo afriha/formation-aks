@@ -64,7 +64,7 @@ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/
 # Join the nodes
 
 
-Before joining the cluster, run th same script to prepare the node. One it's done, we can proceed.
+Before joining the cluster, run th same script to prepare the node. Once it's done, we can proceed.
 
 If you did not note down the join command on the controlplane node after running `kubeadm`, you can recover it by running the following on `controlplane`
 

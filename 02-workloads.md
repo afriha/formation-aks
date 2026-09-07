@@ -1,3 +1,28 @@
+# Namspace
+To deploy a namespace, you need to create a YAML file named **namespace.yaml**. Use the example below:
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+```
+
+## ResourceQuota
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+    name: compute-quota
+    namespace: dev
+spec:
+    hard:
+        pods: "10"
+        requests.cpu: "4"
+        requests.memory: 5Gi
+        limits.cpu: "10"
+        limits.memory: 10Gi
+```
+
 # Pods
 To deploy a POD, you need to create a YAML file named **pod.yaml**. Use the example below:
 

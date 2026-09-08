@@ -252,9 +252,24 @@ data:
   DB_HOST: mysql
   DB_PORT: "3306"
 ```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+ name: myapp-pod-config
+ namespace: dev
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    envFrom:
+    - configMapRef:
+        name: app-config
+````
 ```bash
 kubectl apply -f filename.yaml
 kubectl get configmap -n dev
+kubectl exec -it myapp-pod- -n dev -- printenv
 ```
 ## Secret
 ```yaml

@@ -251,8 +251,7 @@ metadata:
 data:
   DB_HOST: mysql
   DB_PORT: "3306"
-```
-```yaml
+---
 apiVersion: v1
 kind: Pod
 metadata:

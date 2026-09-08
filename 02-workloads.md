@@ -85,7 +85,7 @@ kubectl delete -f filename.yaml
 # Manual Scheduling
 ## Node selector
 ```yaml
-apiVersion:
+apiVersion: v1
 kind: Pod
 metadata:
  name: myapp-pod
@@ -109,7 +109,7 @@ kubectl taint nodes node01 app=blue:NoSchedule
 ```
 Apply a toleration to your pod
 ```yaml
-apiVersion:
+apiVersion: v1
 kind: Pod
 metadata:
  name: myapp-pod-taint
@@ -136,7 +136,7 @@ kubectl label nodes node01 size=small
 ```
 Apply the nodeSelector to your pod
 ```yaml
-apiVersion:
+apiVersion: v1
 kind: Pod
 metadata:
  name: myapp-pod-selector

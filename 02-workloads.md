@@ -7,6 +7,7 @@ metadata:
   name: dev
 ```
 ```bash
+kubectl apply -f filename.yaml
 kubectl get namespaces
 kubectl get namespace dev
 ```
@@ -25,9 +26,12 @@ spec:
         limits.cpu: "10"
         limits.memory: 10Gi
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get resourcequota -n dev
+```
 # Pods
 To deploy a POD, you need to create a YAML file named **pod.yaml**. Use the example below:
-
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -45,8 +49,10 @@ spec:
 ```
 Then run kubectl apply command against this file.
 ```bash
-kubectl apply -f pod.yaml
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
 ```
+You should see an error about defining resource limits. Jump to next section
 ## Resource Limits
 ```yaml
 apiVersion: v1
@@ -70,6 +76,12 @@ spec:
       httpGet: {path: /, port: 80}
       initialDelaySeconds: 10
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+# Cleanup
+kubectl delete -f filename.yaml
+```
 # Manual Scheduling
 ## Node selector
 ```yaml
@@ -83,6 +95,12 @@ spec:
   - name: nginx-container
     image: nginx
   nodeName: node01
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+# Cleanup
+kubectl delete -f filename.yaml
 ```
 ## Taint and tolerations
 Add a taint to your node
@@ -106,6 +124,12 @@ spec:
     value: "blue"
     effect: "NoSchedule"
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+# Cleanup
+kubectl delete -f filename.yaml
+```
 ## NodeSelector
 ```bash
 kubectl label nodes node01 size=small
@@ -128,6 +152,12 @@ spec:
     effect: "NoSchedule"
   nodeSelector:
     size: small
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+# Cleanup
+kubectl delete -f filename.yaml
 ```
 ## NodeAffinity
 ```yaml
@@ -154,4 +184,74 @@ spec:
     value: "blue"
     effect: "NoSchedule"
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+# Cleanup
+kubectl delete -f filename.yaml
+```
 # Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-deploy
+  name: nginx-deploy
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-deploy
+  template:
+    metadata:
+      labels:
+        app: nginx-deploy
+    spec:
+      containers:
+      - image: nginx:1.24
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources:
+          requests: {cpu: "250m", memory: "64Mi"}
+          limits:   {cpu: "500m", memory: "128Mi"}
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n dev
+
+# On change la version d'image:
+kubectl set image deployment/nginx-deploy nginx=nginx:1.25 -n dev
+
+# Observer en temps réel :
+kubectl get pods -n dev -w
+
+# Check history
+kubectl rollout status deploy/nginx-deploy -n dev
+kubectl rollout history deploy/nginx-deploy -n dev
+
+# Rollback
+kubectl rollout undo deploy/nginx-deploy -n dev
+# Rollback vers révision spécifique :
+kubectl rollout undo deploy/nginx-deploy --to-revision=1 -n dev
+
+# Cleanup
+kubectl delete -f filename.yaml
+```
+# ConfigMaps
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: dev
+data:
+  DB_HOST: mysql
+  DB_PORT: "3306"
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get configmap -n dev
+```

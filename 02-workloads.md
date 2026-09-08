@@ -269,20 +269,5 @@ spec:
 ```bash
 kubectl apply -f filename.yaml
 kubectl get configmap -n dev
-kubectl exec -it myapp-pod- -n dev -- printenv
-```
-## Secret
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: app-config
-  namespace: dev
-data:
-  DB_HOST: mysql
-  DB_PORT: "3306"
-```
-```bash
-kubectl apply -f filename.yaml
-kubectl get secret -n dev
+kubectl exec -it myapp-pod-config -n dev -- printenv
 ```

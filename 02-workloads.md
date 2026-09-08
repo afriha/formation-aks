@@ -240,7 +240,8 @@ kubectl rollout undo deploy/nginx-deploy --to-revision=1 -n dev
 # Cleanup
 kubectl delete -f filename.yaml
 ```
-# ConfigMaps
+# Configuration
+## ConfigMap
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -254,4 +255,19 @@ data:
 ```bash
 kubectl apply -f filename.yaml
 kubectl get configmap -n dev
+```
+## Secret
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: dev
+data:
+  DB_HOST: mysql
+  DB_PORT: "3306"
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get secret -n dev
 ```

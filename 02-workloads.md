@@ -1,4 +1,3 @@
-<img width="320" height="255" alt="image" src="https://github.com/user-attachments/assets/81241725-34c7-4fb7-b6f1-21b081b6e3f4" /><img width="265" height="279" alt="image" src="https://github.com/user-attachments/assets/90995845-3030-492c-9e1a-7e84c5efe69f" /><img width="676" height="470" alt="image" src="https://github.com/user-attachments/assets/1b41a8ec-8b15-4124-83ac-6770e330d827" /># Namspace
 To deploy a namespace, you need to create a YAML file named **namespace.yaml**. Use the example below:
 ```yaml
 apiVersion: v1

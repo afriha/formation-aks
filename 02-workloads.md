@@ -315,3 +315,18 @@ kubectl get services -n dev
 curl IP:NODEPORT # You can also access it on your browser
 ```
 ## Ingress
+
+# Helm
+Helm is a package manager for Kubernetes. Install it with this command:
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
+We will now deploy the Ingress Controller:
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx --create-namespace --namespace ingress-controller
+```

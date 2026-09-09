@@ -465,21 +465,21 @@ spec:
   - http:
       paths:
       - path: /main(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: mainpage-svc
             port: 
               number: 80
       - path: /doc(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: docpage-svc
             port: 
               number: 80
       - path: /(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: mainpage-svc

@@ -1,4 +1,4 @@
-# Namspace
+<img width="676" height="470" alt="image" src="https://github.com/user-attachments/assets/1b41a8ec-8b15-4124-83ac-6770e330d827" /># Namspace
 To deploy a namespace, you need to create a YAML file named **namespace.yaml**. Use the example below:
 ```yaml
 apiVersion: v1
@@ -485,4 +485,27 @@ spec:
             name: mainpage-svc
             port:
               number: 80
+```
+# Storage
+## Volumes
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: random-number-generator
+  namespace: ingressapp-demo
+spec:
+  containers:
+  - image: alpine
+    name: alpine
+    command: ["/bin/sh","-c"]
+    args: ["shuf -i 0-100 -n 1 >> /opt/number.out;"]
+    volumeMounts:
+    - mountPath: /opt
+      name: data-volume
+  volumes:
+  - name: data-volume
+    hostPath:
+      path: /data
+      type: Directory
 ```

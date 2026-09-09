@@ -334,3 +334,155 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx --create-namespace --namespace ingress-controller
 ```
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingressapp-demo
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: index-html-main
+ namespace: ingressapp-demo
+data:
+ index.html: |
+   <html>
+   <h1>Welcome to Ooredoo Kubernetes training</h1>
+   </br>
+   <h2>Hi! This is the main page of the app </h2>
+   </html
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: index-html-doc
+ namespace: ingressapp-demo
+data:
+ index.html: |
+   <html>
+   <h1>Welcome to Ooredoo Kubernetes training</h1>
+   </br>
+   <h2>Hi! This is the doc page of the app </h2>
+   </html
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: mainpage
+  name: ingressdemoapp-main
+  namespace: ingressapp-demo
+spec:
+  volumes:
+  - name: nginx-index-file
+    configMap:
+      name: index-html-main  
+  containers:
+  - image: nginx
+    name: ingressdemoapp-main
+    volumeMounts:
+    - name: nginx-index-file
+      mountPath: /usr/share/nginx/html/
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: docpage
+  name: ingressdemoapp-doc
+  namespace: ingressapp-demo
+spec:
+  volumes:
+  - name: nginx-index-file
+    configMap:
+      name: index-html-doc  
+  containers:
+  - image: nginx
+    name: ingressdemoapp-doc
+    volumeMounts:
+    - name: nginx-index-file
+      mountPath: /usr/share/nginx/html/
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
+Then we will add services, pointing to those 2 pods:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: docpage
+  name: docpage-svc
+  namespace: ingressapp-demo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: docpage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rootpage
+  name: mainpage-svc
+  namespace: ingressapp-demo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: mainpage
+```
+Now we want to use an ingress so that the main page is available on the `/main` path and the doc page is available on the `/doc` path.
+We will create the ingress manifest with 2 rules:
+
+```yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-demo
+  namespace: ingressapp-demo
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /main(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: mainpage-svc
+            port: 
+              number: 80
+      - path: /doc(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: docpage-svc
+            port: 
+              number: 80
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: mainpage-svc
+            port:
+              number: 80
+```

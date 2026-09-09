@@ -313,6 +313,10 @@ spec:
 kubectl apply -f filename.yaml
 kubectl get services -n dev
 curl IP:NODEPORT # You can also access it on your browser
+
+# On a deeper level, check your iptables
+sudo nft list table ip nat
+
 ```
 ## Ingress
 

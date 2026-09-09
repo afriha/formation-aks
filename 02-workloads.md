@@ -1,4 +1,4 @@
-<img width="676" height="470" alt="image" src="https://github.com/user-attachments/assets/1b41a8ec-8b15-4124-83ac-6770e330d827" /># Namspace
+<img width="320" height="255" alt="image" src="https://github.com/user-attachments/assets/81241725-34c7-4fb7-b6f1-21b081b6e3f4" /><img width="265" height="279" alt="image" src="https://github.com/user-attachments/assets/90995845-3030-492c-9e1a-7e84c5efe69f" /><img width="676" height="470" alt="image" src="https://github.com/user-attachments/assets/1b41a8ec-8b15-4124-83ac-6770e330d827" /># Namspace
 To deploy a namespace, you need to create a YAML file named **namespace.yaml**. Use the example below:
 ```yaml
 apiVersion: v1
@@ -508,4 +508,49 @@ spec:
     hostPath:
       path: /data
       type: Directory
+```
+## PersistenVolumes
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-vol1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 500Mi
+  hostPath:
+    path: /data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+  namespace: ingressapp-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: random-number-generator-pv
+  namespace: ingressapp-demo
+spec:
+  containers:
+  - image: alpine
+    name: alpine
+    command: ["/bin/sh","-c"]
+    args: ["shuf -i 0-100 -n 1 >> /opt/pv.out;"]
+    volumeMounts:
+    - mountPath: /opt
+      name: data-volume
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: myclaim
 ```

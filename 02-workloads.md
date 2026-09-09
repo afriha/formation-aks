@@ -246,11 +246,11 @@ kubectl delete -f filename.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-config
+  name: index-html-configmap
   namespace: dev
 data:
-  DB_HOST: mysql
-  DB_PORT: "3306"
+  index.html: |
+    <h1> Hello formation </h2>
 ---
 apiVersion: v1
 kind: Pod
@@ -258,15 +258,60 @@ metadata:
  name: myapp-pod-config
  namespace: dev
 spec:
+  volumes:
+  - name: nginx-index-file
+    configMap:
+      name: index-html-configmap
   containers:
   - name: nginx-container
     image: nginx
-    envFrom:
-    - configMapRef:
-        name: app-config
-````
+    volumeMounts:
+    - name: nginx-index-file # Must match the volume name above
+      mountPath: /usr/share/nginx/html/
+```
 ```bash
 kubectl apply -f filename.yaml
 kubectl get configmap -n dev
-kubectl exec -it myapp-pod-config -n dev -- printenv
+kubectl exec myapp-pod-config -n dev -- curl localhost:80
 ```
+# Services
+## NodePort
+We use NodePort to expose our apps at the node level
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod-config
+  namespace: dev
+  labels:
+    env: formation # Important for selectors
+    app: nginx
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    env: formation
+    app: nginx
+  name: myapp-pod-expose
+  namespace: dev
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    env: formation # We have to match pod labels
+    app: nginx
+  type: NodePort
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get services -n dev
+curl IP:NODEPORT # You can also access it on your browser
+```
+## Ingress

@@ -656,6 +656,10 @@ rules:
     resources: ["pods/log"]
     verbs: ["get"]
 
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+
   # Deployments
   - apiGroups: ["apps"]
     resources: ["deployments"]

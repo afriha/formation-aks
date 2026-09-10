@@ -631,3 +631,55 @@ kubectl config set-context kubeadm-lab --cluster=kubeadm-lab --user=friha
 kubectl config use-context kubeadm-lab
 ```
 ## Authorization
+Now that we created our user, we will give them some rights.
+```bash
+# We need the admin kubeconfig to do these steps
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/admin.config
+sudo chmod 777 .kube/admin.config
+# We can pass the kubeconfig to kubectl
+kubectl get pods --kubeconfig=.kube/admin.config - A
+```
+## Role
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ingressapp-demo-manager
+  namespace: ingressapp-demo
+rules:
+  # Pods
+  - apiGroups: [""]
+    resources: ["pods","services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Deployments
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Ingresses
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ingressapp-demo-manager
+  namespace: ingressapp-demo
+subjects:
+  - kind: User
+    name: friha
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: ingressapp-demo-manager
+  apiGroup: rbac.authorization.k8s.io
+```
+```bash
+# We apply the rights creation using admin rights
+kubectl apply -f filename.yaml --kubeconfig=.kube/admin.config
+
+# We check the resources using our default rights (friha)
+kubectl get pods -n ingressapp-demo
+```

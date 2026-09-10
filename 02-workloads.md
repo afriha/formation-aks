@@ -685,3 +685,66 @@ kubectl get pods -n ingressapp-demo
 # Try a different namespace
 kubectl get pods
 ```
+# Troubleshooting
+Let's create these objects:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: index-html-configmap
+ namespace: ingressapp-demo
+data:
+ index.html: |
+   <html>
+   <h1>Welcome to Ooredoo Kubernetes training</h1>
+   </br>
+   <h2>Hi! This is a configmap Index file </h2>
+   </html>
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: nginx
+  name: demo-pod
+  namespace: ingressapp-demo
+spec:
+  volumes:
+  - name: nginx-index-file
+    configMap:
+      name: index-html
+  containers:
+  - image: npinx
+    name: podwitherror
+    volumeMounts:
+    - name: nginx-index
+      mountPath: /usr/share/nginx/html/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: demo
+  name: demo-svc
+  namespace: ingressapp-demo
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+```
+```bash
+# We apply the rights creation using admin rights
+kubectl apply -f filename.yaml
+
+# We check the resources
+kubectl get pods -n ingressapp-demo
+kubectl get services -n ingressapp-demo
+curl 192.168.56.11:NodePort
+
+# Time to debug
+kubectl describe pod -n ingressapp-demo demo-pod
+```

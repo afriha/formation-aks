@@ -637,7 +637,7 @@ Now that we created our user, we will give them some rights. Since we changed ou
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/admin.config
 sudo chmod 777 .kube/admin.config
 # We can pass the kubeconfig to kubectl
-kubectl get pods --kubeconfig=.kube/admin.config - A
+kubectl get pods --kubeconfig=.kube/admin.config -A
 ```
 ## Role
 ```yaml

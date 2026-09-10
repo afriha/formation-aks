@@ -746,6 +746,7 @@ spec:
 ```
 ```bash
 # We apply the rights creation using admin rights
+kubectl config set-context kubeadm-lab --namespace=ingressapp-demo
 kubectl apply -f filename.yaml
 
 # We check the resources

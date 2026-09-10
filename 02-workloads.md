@@ -682,4 +682,6 @@ kubectl apply -f filename.yaml --kubeconfig=.kube/admin.config
 
 # We check the resources using our default rights (friha)
 kubectl get pods -n ingressapp-demo
+# Try a different namespace
+kubectl get pods
 ```

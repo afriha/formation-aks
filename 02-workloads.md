@@ -649,7 +649,7 @@ metadata:
 rules:
   # Pods
   - apiGroups: [""]
-    resources: ["pods","services"]
+    resources: ["pods","services","configMaps"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
   # Deployments

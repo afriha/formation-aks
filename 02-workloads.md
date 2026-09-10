@@ -652,6 +652,10 @@ rules:
     resources: ["pods","services","configMaps"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+
   # Deployments
   - apiGroups: ["apps"]
     resources: ["deployments"]

@@ -631,9 +631,9 @@ kubectl config set-context kubeadm-lab --cluster=kubeadm-lab --user=friha
 kubectl config use-context kubeadm-lab
 ```
 ## Authorization
-Now that we created our user, we will give them some rights.
+Now that we created our user, we will give them some rights. Since we changed our kubeconfig, we need to get the admin config again from the default kubeadm output folder.
 ```bash
-# We need the admin kubeconfig to do these steps
+# Copy admin kubeconfig
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/admin.config
 sudo chmod 777 .kube/admin.config
 # We can pass the kubeconfig to kubectl

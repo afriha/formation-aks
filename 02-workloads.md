@@ -333,6 +333,11 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx --create-namespace --namespace ingress-controller
 ```
+```bash
+# Check ingress-controller pod and service
+kubectl get pods -n ingress-controller
+kubectl get services -n ingress-controller
+```
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -376,7 +381,7 @@ spec:
   volumes:
   - name: nginx-index-file
     configMap:
-      name: index-html-main  
+      name: index-html-main
   containers:
   - image: nginx
     name: ingressdemoapp-main
@@ -399,7 +404,7 @@ spec:
   volumes:
   - name: nginx-index-file
     configMap:
-      name: index-html-doc  
+      name: index-html-doc
   containers:
   - image: nginx
     name: ingressdemoapp-doc
@@ -411,6 +416,11 @@ spec:
   restartPolicy: Always
 status: {}
 
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get configmaps -n ingressapp-demo
+kubectl get pods -n ingressapp-demo
 ```
 Then we will add services, pointing to those 2 pods:
 ```yaml
@@ -444,11 +454,14 @@ spec:
   selector:
     app: mainpage
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get services -n ingressapp-demo
+```
 Now we want to use an ingress so that the main page is available on the `/main` path and the doc page is available on the `/doc` path.
 We will create the ingress manifest with 2 rules:
 
 ```yaml
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -468,14 +481,14 @@ spec:
         backend:
           service:
             name: mainpage-svc
-            port: 
+            port:
               number: 80
       - path: /doc(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: docpage-svc
-            port: 
+            port:
               number: 80
       - path: /(.*)
         pathType: ImplementationSpecific
@@ -485,7 +498,15 @@ spec:
             port:
               number: 80
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get ingress -n ingressapp-demo
+
+# curl your controlplane or node's IP with ingress-controller's service NodePort's port or open it in your browser
+curl IP:INGRESS_CONTROLLER_SERVICE_NODEPORT
+```
 # Storage
+First, create the /data folder on your nodes.
 ## Volumes
 ```yaml
 apiVersion: v1
@@ -507,6 +528,13 @@ spec:
     hostPath:
       path: /data
       type: Directory
+```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n ingressapp-demo
+
+# Check the generated file on the pod
+kubectl exec random-number-generator -n ingressapp-demo -- cat /opt/number.out
 ```
 ## PersistenVolumes
 ```yaml
@@ -553,3 +581,53 @@ spec:
     persistentVolumeClaim:
       claimName: myclaim
 ```
+```bash
+kubectl apply -f filename.yaml
+kubectl get pods -n ingressapp-demo
+
+# Check the generated file on the pod
+kubectl exec random-number-generator-pv -n ingressapp-demo -- cat /opt/pv.out
+```
+# Security
+In order to authenticate to Kubernetes, we need to create a new user and give them rights
+The steps needed to do that are:
+openssl genrsa -out friha.key 2048
+1. Create a private key for the user.
+2. Create a CSR containing the user's identity.
+3. Have the Kubernetes CA sign the CSR.
+4. Put the resulting client certificate and key into a kubeconfig.
+5. Create an RBAC Role/ClusterRole.
+6. Bind that role to the user via RoleBinding/ClusterRoleBinding.
+7. Test access using the user's kubeconfig.
+## Authentication
+### Create User
+```bash
+# Check Kubernetes CA certficate
+cat /etc/kubernetes/pki/ca.crt
+cat /etc/kubernetes/pki/ca.key
+
+# Generate private key for your user
+openssl genrsa -out friha.key 2048
+
+# Generate certificate signing request and sign it
+openssl req -new -key friha.key -out friha.csr -subj "/CN=friha/O=developers"
+sudo openssl x509 -req -in friha.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out friha.crt -days 365
+
+# Now you have
+friha.key   # private key
+friha.csr   # certificate signing request
+friha.crt   # client certificate
+```
+### Kubeconfig
+Now that we created a user, we're gonna use the generated files to authenticate against our cluster
+```bash
+# Show your cluster's config
+kubectl config view
+
+# Generate the kubeconfig with the generated usr certs
+kubectl config set-cluster kubeadm-lab --server=https://192.168.56.11:6443 --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
+kubectl config set-credentials friha --client-certificate="friha.crt" --client-key="friha.key" --embed-certs=true
+kubectl config set-context kubeadm-lab --cluster=kubeadm-lab --user=friha
+kubectl config use-context kubeadm-lab
+```
+## Authorization
